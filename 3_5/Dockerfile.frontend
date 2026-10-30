@@ -1,0 +1,13 @@
+FROM node:16
+WORKDIR /app
+
+RUN npm install -g serve@14 && useradd -m appuser && chown appuser:appuser /app
+COPY --chown=appuser:appuser code/example-frontend .
+USER appuser
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+RUN npm install
+RUN npm run build
+
+EXPOSE 5001
+CMD ["serve", "-s", "-l", "5001", "build"]

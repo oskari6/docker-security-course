@@ -1,0 +1,19 @@
+FROM golang:1.16
+WORKDIR /app
+
+RUN useradd -m appuser && chown appuser:appuser /app
+COPY --chown=appuser:appuser code/example-backend .
+USER appuser
+
+RUN go build -ldflags="-s -w" -o server \
+    && go clean -cache -modcache \
+    && rm -rf cache \
+    && rm -rf common \
+    && rm -rf controller \
+    && rm -rf pgconnection \
+    && rm -rf router \
+    && rm app.go app_test.go go.mod go.sum README.md .gitignore .dockerignore
+ENV REQUEST_ORIGIN=http://localhost:5001
+
+EXPOSE 8080
+CMD ["./server"]

@@ -1,0 +1,21 @@
+FROM node:16-alpine
+WORKDIR /app
+
+COPY code/example-frontend .
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+RUN npm install -g serve@14 \
+    && npm install \
+    && npm run build \
+    && npm cache clean --force \
+    && rm -rf node_modules \
+    && rm -rf src \
+    && rm -rf public \
+    && rm package.json package-lock.json README.md .gitignore .dockerignore \
+    && adduser -D appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 5001
+CMD ["serve", "-s", "-l", "5001", "build"]
